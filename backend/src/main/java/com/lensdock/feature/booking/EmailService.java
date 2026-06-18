@@ -68,13 +68,14 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setFrom("LensDock Camera Rental <" + fromEmail + ">");
+            helper.setReplyTo(fromEmail);
             helper.setTo(booking.getEmail());
             helper.setSubject(getSubject(status, booking));
             helper.setText(buildHtml(booking), true);
 
             // Anti-spam headers
             message.addHeader("X-Mailer", "LensDock-Notification-System");
-            message.addHeader("Precedence", "bulk");
+            message.addHeader("X-Auto-Response-Suppress", "All");
             message.addHeader("X-Priority", "3");
 
             mailSender.send(message);
