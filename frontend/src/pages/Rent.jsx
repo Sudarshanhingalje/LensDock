@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Camera, ShieldCheck, Battery, Zap, Loader2, Upload, Phone, CheckCircle, X } from "lucide-react";
+import { Camera, ShieldCheck, Battery, Zap, Loader2, Upload, Phone, CheckCircle, X, Lock, AlertCircle, Info } from "lucide-react";
 import { PageHero, Reveal } from "../components/PageHero";
 import { getPublicSettings, submitBooking } from "../lib/api";
 import { toast } from "sonner";
@@ -90,6 +90,22 @@ export default function Rent() {
   const [email, setEmail]       = useState("");
   const [idPreview, setIdPreview] = useState(null);
 
+  // Consent Checkboxes for Aadhaar ID Verification
+  const [consents, setConsents] = useState({
+    belongsToMe: false,
+    useConsent: false,
+    noShare: false,
+    autoDelete: false,
+    terms: false,
+    privacy: false,
+  });
+
+  const allConsentsChecked = Object.values(consents).every(Boolean);
+
+  const handleCheckboxChange = (key) => {
+    setConsents(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
   // Settings from backend (hardcoded defaults shown immediately, overridden by API)
   const [settings, setSettings] = useState({
     pricePerDay: 600,
@@ -118,9 +134,25 @@ export default function Rent() {
   const handleIdUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { toast.error("Max file size is 5 MB."); return; }
+
+    // Allowed file formats check (JPG, JPEG, PNG)
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Invalid file format. Only JPG, JPEG, and PNG are allowed.");
+      return;
+    }
+
+    // Maximum file size check (1 MB)
+    if (file.size > 1 * 1024 * 1024) {
+      toast.error("File exceeds 1 MB limit. Please compress or crop the image.");
+      return;
+    }
+
     const reader = new FileReader();
-    reader.onloadend = () => setIdPreview(reader.result);
+    reader.onloadend = () => {
+      setIdPreview(reader.result);
+      toast.success("Aadhaar ID image selected successfully!");
+    };
     reader.readAsDataURL(file);
   };
 
@@ -128,6 +160,7 @@ export default function Rent() {
     e.preventDefault();
     if (!fullName.trim() || !phone.trim()) { toast.error("Name and phone are required."); return; }
     if (!idPreview)                         { toast.error("Please upload your Aadhaar / ID card."); return; }
+    if (!allConsentsChecked)                { toast.error("Please agree to all legal consents and privacy policies."); return; }
     if (!range.start)                       { toast.error("Please select rental dates."); return; }
 
     const today = new Date();
@@ -147,6 +180,15 @@ export default function Rent() {
         aadhaarImage: idPreview,
       });
       setSubmitted(true);
+      // Reset consents
+      setConsents({
+        belongsToMe: false,
+        useConsent: false,
+        noShare: false,
+        autoDelete: false,
+        terms: false,
+        privacy: false,
+      });
       toast.success("Booking submitted! We'll confirm via WhatsApp.");
     } catch (err) {
       toast.error(err.message || "Submission failed. Please try again.");
@@ -302,67 +344,220 @@ export default function Rent() {
           </div>
         </div>
       </section>
-
       {/* ── Checkout Modal ── */}
       <AnimatePresence>
         {showCheckout && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-4 overflow-y-auto"
           >
-            <motion.div initial={{ scale: 0.92, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.92, y: 20 }}
-              className="relative w-full max-w-md rounded-3xl border border-border bg-card p-6 shadow-2xl"
+            <motion.div initial={{ scale: 0.95, y: 15 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 15 }}
+              className="relative w-full max-w-4xl rounded-3xl border border-primary/20 bg-card p-6 md:p-8 shadow-2xl overflow-y-auto max-h-[90vh]"
             >
+              {/* Close Button */}
               <button onClick={() => setShowCheckout(false)}
-                className="absolute right-4 top-4 rounded-full p-1 hover:bg-muted transition"
-              ><X className="h-4 w-4" /></button>
+                className="absolute right-5 top-5 rounded-full p-2 hover:bg-muted text-muted-foreground hover:text-foreground transition"
+              ><X className="h-5 w-5" /></button>
 
-              <h2 className="text-xl font-semibold">Complete Your Booking</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {days} day{days !== 1 ? "s" : ""} · ₹{rentalFee.toLocaleString("en-IN")} + ₹{settings.depositAmount.toLocaleString("en-IN")} deposit
-              </p>
+              {/* Title & Trust Header */}
+              <div className="mb-6 flex items-start gap-3 border-b border-border pb-4">
+                <div className="rounded-xl bg-primary/10 p-2.5 text-primary">
+                  <Lock className="h-6 w-6" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-semibold text-foreground tracking-tight flex items-center gap-2">
+                    Complete Identity Verification
+                  </h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    LensDock implements strict privacy-focused data verification. Your uploaded ID is encrypted and automatically deleted after your camera return.
+                  </p>
+                </div>
+              </div>
 
-              <form onSubmit={handleSubmit} className="mt-5 space-y-4">
-                <div>
-                  <label className="mb-1 block text-sm font-medium">Full Name *</label>
-                  <input id="rent-name" type="text" required value={fullName} onChange={e => setFullName(e.target.value)}
-                    className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 ring-primary/40 transition"
-                    placeholder="Your full name"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block text-sm font-medium">Phone / WhatsApp *</label>
-                  <input id="rent-phone" type="tel" required value={phone} onChange={e => setPhone(e.target.value)}
-                    className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 ring-primary/40 transition"
-                    placeholder="+91 98765 43210"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block text-sm font-medium">Email (optional)</label>
-                  <input id="rent-email" type="email" value={email} onChange={e => setEmail(e.target.value)}
-                    className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 ring-primary/40 transition"
-                    placeholder="you@email.com"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block text-sm font-medium">Aadhaar / PAN Card *</label>
-                  <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-border p-4 hover:border-primary/60 transition">
-                    <Upload className="h-5 w-5 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">
-                      {idPreview ? "ID uploaded ✓" : "Click to upload (max 5 MB)"}
-                    </span>
-                    <input type="file" accept="image/*,application/pdf" className="sr-only" onChange={handleIdUpload} />
-                  </label>
-                  {idPreview && idPreview.startsWith("data:image") && (
-                    <img src={idPreview} alt="ID Preview" className="mt-2 h-24 rounded-xl border border-border object-cover" />
-                  )}
+              <form onSubmit={handleSubmit} className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
+                
+                {/* ── Left Column: Form & Consents ── */}
+                <div className="space-y-5">
+                  <div>
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-primary mb-3">1. Contact Information</h3>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="mb-1 block text-xs font-medium text-muted-foreground">Full Name *</label>
+                        <input id="rent-name" type="text" required value={fullName} onChange={e => setFullName(e.target.value)}
+                          className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 ring-primary/20 transition"
+                          placeholder="Enter your full name"
+                        />
+                      </div>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div>
+                          <label className="mb-1 block text-xs font-medium text-muted-foreground">Phone / WhatsApp *</label>
+                          <input id="rent-phone" type="tel" required value={phone} onChange={e => setPhone(e.target.value)}
+                            className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 ring-primary/20 transition"
+                            placeholder="+91 98765 43210"
+                          />
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-xs font-medium text-muted-foreground">Email (optional)</label>
+                          <input id="rent-email" type="email" value={email} onChange={e => setEmail(e.target.value)}
+                            className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 ring-primary/20 transition"
+                            placeholder="you@email.com"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ID Upload Box */}
+                  <div>
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-primary mb-2">2. Upload ID Proof</h3>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Please upload **ONE image** containing both the Front and Back of your Aadhaar card.
+                    </p>
+                    
+                    {!idPreview ? (
+                      <label className="flex flex-col items-center justify-center cursor-pointer rounded-2xl border border-dashed border-primary/20 hover:border-primary/50 bg-primary/[0.02] hover:bg-primary/[0.05] p-6 text-center transition">
+                        <Upload className="h-8 w-8 text-primary mb-2" />
+                        <span className="text-sm font-medium text-foreground">Click to upload image</span>
+                        <span className="text-xs text-muted-foreground mt-1">Accepted formats: JPG, JPEG, PNG (Max 1 MB)</span>
+                        <input type="file" accept="image/jpeg,image/jpg,image/png" className="sr-only" onChange={handleIdUpload} />
+                      </label>
+                    ) : (
+                      <div className="relative rounded-2xl border border-border bg-card/40 p-3 flex items-center justify-between">
+                        <div className="flex items-center gap-3 overflow-hidden">
+                          <img src={idPreview} alt="Aadhaar Upload Preview" className="h-14 w-14 rounded-lg object-cover border border-border" />
+                          <div className="overflow-hidden">
+                            <p className="text-xs font-semibold text-foreground truncate">Aadhaar_ID_Uploaded.png</p>
+                            <p className="text-[10px] text-green-400 font-medium">Image size and type verified ✓</p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setIdPreview(null)}
+                          className="rounded-lg border border-red-500/30 px-3 py-1.5 text-xs text-red-400 hover:bg-red-500/10 transition"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 6 Required Consent Checkboxes */}
+                  <div className="rounded-2xl border border-primary/10 bg-primary/[0.02] p-4 space-y-3">
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-primary flex items-center gap-1.5 mb-1">
+                      <ShieldCheck className="h-4 w-4" /> Legal Consents & Privacy Policy
+                    </h4>
+                    
+                    <div className="space-y-2.5">
+                      {[
+                        { key: "belongsToMe", text: "I confirm that the uploaded ID proof belongs to me." },
+                        { key: "useConsent", text: "I consent to LensDock using my ID proof only for identity verification and rental security purposes." },
+                        { key: "noShare", text: "I understand that my ID proof will not be shared with third parties except when required by law." },
+                        { key: "autoDelete", text: "I understand that my ID proof will be securely deleted after the rental process is completed and the retention period ends." },
+                        { key: "terms", text: "I agree to the Terms & Conditions." },
+                        { key: "privacy", text: "I agree to the Privacy Policy." }
+                      ].map((item) => (
+                        <label key={item.key} className="flex items-start gap-3 cursor-pointer text-xs select-none">
+                          <input
+                            type="checkbox"
+                            checked={consents[item.key]}
+                            onChange={() => handleCheckboxChange(item.key)}
+                            className="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-primary focus:ring-offset-background"
+                          />
+                          <span className={consents[item.key] ? "text-foreground transition-colors" : "text-muted-foreground transition-colors"}>
+                            {item.text}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
-                <button type="submit" disabled={submitting}
-                  className="btn-primary flex w-full items-center justify-center gap-2"
-                >
-                  {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
-                  {submitting ? "Submitting…" : "Confirm Booking Request"}
-                </button>
+                {/* ── Right Column: Guidelines & reference ── */}
+                <div className="flex flex-col justify-between space-y-6">
+                  {/* Reference Image Container */}
+                  <div className="rounded-2xl border border-border bg-card/60 p-4 backdrop-blur">
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-primary flex items-center gap-1.5 mb-3">
+                      <Info className="h-4 w-4" /> Required Upload Format
+                    </h4>
+                    
+                    <div className="overflow-hidden rounded-xl border border-border bg-zinc-950 p-1">
+                      <img 
+                        src="/aadhaar-reference.jpg" 
+                        alt="Aadhaar Single Page Print Format" 
+                        className="mx-auto aspect-[4/3] w-full object-contain rounded-lg bg-zinc-900" 
+                      />
+                    </div>
+                    
+                    <p className="mt-2 text-center text-[10px] text-muted-foreground">
+                      Place both FRONT and BACK aligned top-to-bottom on a single sheet.
+                    </p>
+                  </div>
+
+                  {/* ID Quality Guidelines */}
+                  <div className="rounded-2xl border border-border bg-card/40 p-4 space-y-2.5">
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-primary flex items-center gap-1.5">
+                      <AlertCircle className="h-4 w-4" /> Image Quality Rules
+                    </h4>
+                    <ul className="text-xs text-muted-foreground space-y-1.5 pl-1">
+                      <li className="flex items-center gap-1.5">
+                        <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
+                        Image must be clear, sharp, and highly readable.
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
+                        No motion blur, camera shake, or heavy glare/reflections.
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
+                        All four corners of the document must be fully visible (no cropped edges).
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
+                        Both front side and back side must be clearly visible.
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Price & Submit Action */}
+                  <div className="pt-2">
+                    <div className="rounded-2xl border border-border bg-card/50 p-4 mb-4">
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>Rental Fee ({days} Day{days !== 1 ? "s" : ""})</span>
+                        <span>₹{rentalFee.toLocaleString("en-IN")}</span>
+                      </div>
+                      <div className="mt-1 flex justify-between text-xs text-muted-foreground">
+                        <span>Refundable Deposit</span>
+                        <span>₹{settings.depositAmount.toLocaleString("en-IN")}</span>
+                      </div>
+                      <div className="mt-2 pt-2 border-t border-border flex justify-between text-sm font-semibold">
+                        <span>Total Payable</span>
+                        <span className="text-primary">₹{total.toLocaleString("en-IN")}</span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={submitting || !idPreview || !allConsentsChecked}
+                      className="btn-primary flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold shadow-lg hover:shadow-primary/20 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      {submitting ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" /> Submitting Request...
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle className="h-4 w-4" /> Book Now
+                        </>
+                      )}
+                    </button>
+                    
+                    {!allConsentsChecked && (
+                      <p className="mt-2 text-center text-[10px] text-muted-foreground flex items-center justify-center gap-1">
+                        <Lock className="h-3 w-3 text-muted-foreground shrink-0" /> Check all consents above to enable booking
+                      </p>
+                    )}
+                  </div>
+                </div>
+                
               </form>
             </motion.div>
           </motion.div>

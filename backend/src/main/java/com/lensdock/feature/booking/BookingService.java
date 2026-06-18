@@ -19,9 +19,36 @@ public class BookingService {
         this.emailService      = emailService;
     }
 
+    private void validateAadhaarImage(String base64Image) {
+        if (base64Image == null || base64Image.isBlank()) {
+            throw new IllegalArgumentException("Aadhaar / ID Card image is required.");
+        }
+
+        // 1. Check format (prefix)
+        boolean validFormat = base64Image.startsWith("data:image/jpeg;base64,") ||
+                              base64Image.startsWith("data:image/jpg;base64,") ||
+                              base64Image.startsWith("data:image/png;base64,");
+
+        if (!validFormat) {
+            throw new IllegalArgumentException("Invalid file format. Only JPG, JPEG, and PNG are allowed.");
+        }
+
+        // 2. Check size (1 MB limit)
+        // Base64 size formula: length of string after comma * 0.75
+        int commaIndex = base64Image.indexOf(",");
+        if (commaIndex != -1) {
+            String base64Data = base64Image.substring(commaIndex + 1);
+            int sizeInBytes = (int) (base64Data.length() * 0.75);
+            if (sizeInBytes > 1024 * 1024) { // 1 MB = 1048576 bytes
+                throw new IllegalArgumentException("File size exceeds 1 MB limit.");
+            }
+        }
+    }
+
     /** Public: Submit a new booking request */
     @Transactional
     public Booking createBooking(Booking booking) {
+        validateAadhaarImage(booking.getAadhaarImage());
         return bookingRepository.save(booking);
     }
 
@@ -42,6 +69,11 @@ public class BookingService {
                 .orElseThrow(() -> new RuntimeException("Booking not found: " + id));
 
         booking.setStatus(newStatus.toUpperCase());
+
+        // Securely wipe Aadhaar / ID proof immediately upon rental completion or rejection
+        if ("RETURNED".equalsIgnoreCase(newStatus) || "REJECTED".equalsIgnoreCase(newStatus)) {
+            booking.setAadhaarImage("[SECURELY_DELETED]");
+        }
 
         // Send status email and track result
         boolean sent = emailService.sendStatusEmail(booking);
