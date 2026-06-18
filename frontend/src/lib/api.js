@@ -1,10 +1,10 @@
 // Central API client – all backend calls go through here.
 // Base URL switches automatically between dev and production.
 
-// In production (Vercel): /api/* is proxied server-side to the AWS backend via vercel.json rewrites.
-// In local dev: Vite devServer proxy forwards /api/* to http://localhost:8080/api.
-// Using a relative path avoids the HTTPS→HTTP mixed-content browser block entirely.
-const BASE_URL = "/api";
+// In production (Vercel): /backend/* is proxied server-side to http://13.235.138.219:8080/api/*
+// Vercel reserves /api/* for its own serverless functions — using /backend avoids the 405 conflict.
+// In local dev: Vite proxy forwards /backend/* → http://localhost:8080/api/*.
+const BASE_URL = import.meta.env.VITE_API_URL || "/backend";
 
 // ─── Token helpers ───────────────────────────────────────────────────────────
 
