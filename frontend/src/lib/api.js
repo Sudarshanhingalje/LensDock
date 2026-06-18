@@ -1,14 +1,16 @@
 // Central API client – all backend calls go through here.
 // Base URL switches automatically between dev and production.
 
-const BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+// In production (Vercel): /api/* is proxied server-side to the AWS backend via vercel.json rewrites.
+// In local dev: Vite devServer proxy forwards /api/* to http://localhost:8080/api.
+// Using a relative path avoids the HTTPS→HTTP mixed-content browser block entirely.
+const BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
 // ─── Token helpers ───────────────────────────────────────────────────────────
 
 export const saveToken = (token) => localStorage.setItem("ld_token", token);
-export const getToken  = ()      => localStorage.getItem("ld_token");
-export const clearToken= ()      => localStorage.removeItem("ld_token");
+export const getToken = () => localStorage.getItem("ld_token");
+export const clearToken = () => localStorage.removeItem("ld_token");
 
 export const isLoggedIn = () => !!getToken();
 
@@ -99,8 +101,12 @@ export const updateSettings = (settings) =>
 
 export const api = {
   get: (path, options = {}) => request(path, { ...options, method: "GET" }),
-  post: (path, body, options = {}) => request(path, { ...options, method: "POST", body: JSON.stringify(body) }),
-  put: (path, body, options = {}) => request(path, { ...options, method: "PUT", body: JSON.stringify(body) }),
-  patch: (path, body, options = {}) => request(path, { ...options, method: "PATCH", body: JSON.stringify(body) }),
-  delete: (path, options = {}) => request(path, { ...options, method: "DELETE" }),
+  post: (path, body, options = {}) =>
+    request(path, { ...options, method: "POST", body: JSON.stringify(body) }),
+  put: (path, body, options = {}) =>
+    request(path, { ...options, method: "PUT", body: JSON.stringify(body) }),
+  patch: (path, body, options = {}) =>
+    request(path, { ...options, method: "PATCH", body: JSON.stringify(body) }),
+  delete: (path, options = {}) =>
+    request(path, { ...options, method: "DELETE" }),
 };

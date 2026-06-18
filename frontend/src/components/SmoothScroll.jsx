@@ -11,7 +11,9 @@ if (typeof window !== "undefined") {
 export function SmoothScroll({ children }) {
   const lenisRef = useRef(null);
   const location = useLocation();
+  const rafRef = useRef(null);
 
+  // Initialize Lenis once on mount
   useEffect(() => {
     const lenis = new Lenis({
       duration: 1.4,
@@ -22,65 +24,56 @@ export function SmoothScroll({ children }) {
     });
     lenisRef.current = lenis;
 
-    lenis.on("scroll", ScrollTrigger.update);
+    const onScroll = () => ScrollTrigger.update();
+    lenis.on("scroll", onScroll);
 
     const raf = (time) => {
       lenis.raf(time * 1000);
     };
+    rafRef.current = raf;
     gsap.ticker.add(raf);
     gsap.ticker.lagSmoothing(0);
 
     return () => {
+      lenis.off("scroll", onScroll);
       gsap.ticker.remove(raf);
       lenis.destroy();
+      // Kill all ScrollTriggers on unmount
       ScrollTrigger.getAll().forEach((t) => t.kill());
     };
   }, []);
 
-  // Scroll to top and refresh layout heights when route changes
+  // On every route change: kill old ScrollTriggers, scroll to top, refresh
   useEffect(() => {
     const lenis = lenisRef.current;
 
-    if (lenis) {
-      // 1. Temporarily detach the ScrollTrigger update listener to prevent crashes during React DOM updates
-      lenis.off("scroll", ScrollTrigger.update);
+    // 1. Kill ALL existing ScrollTriggers — this releases any body overflow/position locks
+    ScrollTrigger.getAll().forEach((t) => t.kill());
 
-      // 2. Perform the immediate scroll to top
-      try {
-        lenis.scrollTo(0, { immediate: true });
-      } catch (e) {
-        window.scrollTo(0, 0);
-      }
-    } else {
-      window.scrollTo(0, 0);
+    // 2. Force-clear any stuck inline styles on html/body that GSAP pin may have set
+    const htmlEl = document.documentElement;
+    const bodyEl = document.body;
+    for (const prop of ["overflow", "height", "position", "top", "left", "width"]) {
+      htmlEl.style.removeProperty(prop);
+      bodyEl.style.removeProperty(prop);
     }
 
-    // 3. Clear any potential stuck styles on html and body (common with pinned ScrollTriggers)
-    try {
-      document.documentElement.style.removeProperty("overflow");
-      document.documentElement.style.removeProperty("height");
-      document.body.style.removeProperty("overflow");
-      document.body.style.removeProperty("height");
-    } catch (e) {}
+    // 3. Scroll to top immediately
+    if (lenis) {
+      try { lenis.scrollTo(0, { immediate: true }); } catch (_) {}
+    }
+    window.scrollTo(0, 0);
 
-    // 4. After the DOM has settled, re-attach ScrollTrigger listener and refresh ScrollTrigger
+    // 4. Re-attach listener and refresh after DOM settles
     const timer = setTimeout(() => {
       try {
-        if (lenis) {
-          lenis.on("scroll", ScrollTrigger.update);
-        }
         ScrollTrigger.refresh();
       } catch (e) {
         console.warn("ScrollTrigger refresh failed:", e);
       }
-    }, 100);
+    }, 150);
 
-    return () => {
-      clearTimeout(timer);
-      if (lenis) {
-        lenis.off("scroll", ScrollTrigger.update);
-      }
-    };
+    return () => clearTimeout(timer);
   }, [location.pathname]);
 
   return <>{children}</>;

@@ -8,7 +8,7 @@ export function PageHero({
   children,
 }) {
   return (
-    <section className="relative overflow-hidden px-6 pt-40 pb-20">
+    <section className="relative overflow-hidden px-4 pt-32 pb-16 sm:px-6 sm:pt-40 sm:pb-20">
       <div className="bg-grid absolute inset-0 opacity-50 [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_70%)]" />
       <div className="absolute left-1/2 top-32 -z-10 h-[400px] w-[700px] -translate-x-1/2 rounded-full bg-primary/10 blur-[160px]" />
       <div className="relative mx-auto max-w-6xl">
@@ -24,7 +24,7 @@ export function PageHero({
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-          className="mt-4 text-5xl font-semibold tracking-tight md:text-7xl lg:text-[88px] lg:leading-[0.95]"
+          className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl md:text-7xl lg:text-[88px] lg:leading-[0.95]"
         >
           {title}
         </motion.h1>

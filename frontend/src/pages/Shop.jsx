@@ -38,7 +38,7 @@ export default function Shop() {
 
       <section className="px-6 pb-32">
         <div className="mx-auto max-w-7xl">
-          <div className="sticky top-24 z-30 mb-10 flex flex-col gap-4 rounded-2xl border border-border bg-background/70 p-4 backdrop-blur-xl md:flex-row md:items-center md:justify-between">
+          <div className="sticky top-20 z-30 mb-8 flex flex-col gap-3 rounded-2xl border border-border bg-background/80 p-3 backdrop-blur-xl sm:top-24 sm:mb-10 sm:gap-4 sm:p-4 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-wrap gap-2">
               {cats.map((c) => (
                 <button

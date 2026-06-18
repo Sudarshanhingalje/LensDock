@@ -200,7 +200,7 @@ export default function Rent() {
   // ── Success screen ──────────────────────────────────────────────────────────
   if (submitted) {
     return (
-      <section className="relative flex min-h-screen items-center justify-center px-6 pt-28 pb-20">
+      <section className="relative flex min-h-screen items-center justify-center px-4 pt-28 pb-20 sm:px-6">
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
           className="max-w-md text-center"
         >
@@ -240,7 +240,7 @@ export default function Rent() {
         subtitle="Professional DSLR for 1–10 days. Includes lens, batteries & carry case. Pick-up from Kolhapur (A/p Nej, Tal. Hatkangle)."
       />
 
-      <section className="px-4 pb-32 md:px-8 lg:px-16">
+      <section className="px-4 pb-20 sm:pb-32">
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-10 lg:grid-cols-2">
 
@@ -348,10 +348,10 @@ export default function Rent() {
       <AnimatePresence>
         {showCheckout && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-4 overflow-y-auto"
+            className="fixed inset-0 z-50 flex items-start justify-center bg-black/85 backdrop-blur-sm p-3 overflow-y-auto sm:items-center sm:p-4"
           >
             <motion.div initial={{ scale: 0.95, y: 15 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 15 }}
-              className="relative w-full max-w-4xl rounded-3xl border border-primary/20 bg-card p-6 md:p-8 shadow-2xl overflow-y-auto max-h-[90vh]"
+              className="relative my-3 w-full max-w-4xl rounded-2xl border border-primary/20 bg-card p-4 shadow-2xl sm:my-0 sm:rounded-3xl sm:p-6 md:p-8"
             >
               {/* Close Button */}
               <button onClick={() => setShowCheckout(false)}
@@ -373,7 +373,7 @@ export default function Rent() {
                 </div>
               </div>
 
-              <form onSubmit={handleSubmit} className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
+              <form onSubmit={handleSubmit} className="grid gap-6 sm:gap-8 lg:grid-cols-[1.2fr_1fr]">
                 
                 {/* ── Left Column: Form & Consents ── */}
                 <div className="space-y-5">

@@ -9,8 +9,6 @@ import {
   useMotionValue,
   useAnimationFrame,
 } from "framer-motion";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Camera, ArrowUpRight, Sparkles, Check } from "lucide-react";
 
 import heroCamera from "@/assets/hero-camera.jpg";
@@ -19,10 +17,6 @@ import g2 from "@/assets/gallery-2.jpg";
 import g3 from "@/assets/gallery-3.png";
 import g4 from "@/assets/gallery-4.jpg";
 import g5 from "@/assets/gallery-5.jpg";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 /* ────────────────────────────────────────────── STAGGER TEXT */
 function StaggerWords({ text, className = "", delay = 0 }) {
@@ -70,7 +64,7 @@ function Hero() {
 
         <motion.div
           style={{ y: titleY, opacity }}
-          className="relative z-10 mx-auto flex h-full max-w-6xl flex-col items-center justify-center px-6 text-center"
+          className="relative z-10 mx-auto flex h-full max-w-6xl flex-col items-center justify-center px-4 sm:px-6 text-center"
         >
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -83,7 +77,7 @@ function Hero() {
             <ArrowUpRight className="h-3.5 w-3.5" />
           </motion.div>
 
-          <h1 className="mt-8 text-5xl font-semibold tracking-tight sm:text-7xl md:text-[96px] md:leading-[0.92]">
+          <h1 className="mt-8 text-4xl font-semibold tracking-tight sm:text-6xl md:text-7xl lg:text-[96px] lg:leading-[0.92]">
             <StaggerWords text="Rent the camera." delay={1.7} />
             <br />
             <span className="text-glow">
@@ -95,7 +89,7 @@ function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 2.4, duration: 0.8 }}
-            className="mx-auto mt-8 max-w-xl text-base text-muted-foreground sm:text-lg"
+            className="mx-auto mt-6 max-w-xl text-sm text-muted-foreground sm:text-base md:text-lg px-4"
           >
             A Canon 80D for your next shoot. A library of original photos for
             everything in between.
@@ -105,17 +99,17 @@ function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 2.6, duration: 0.8 }}
-            className="mt-10 flex flex-wrap items-center justify-center gap-3"
+            className="mt-8 flex flex-wrap items-center justify-center gap-3"
           >
             <Link
               to="/rent"
-              className="btn-glow inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.03]"
+              className="btn-glow inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.03] sm:px-6 sm:py-3"
             >
               Rent the 80D
             </Link>
             <Link
               to="/shop"
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-muted sm:px-6 sm:py-3"
             >
               Browse photos <ArrowUpRight className="h-4 w-4" />
             </Link>
@@ -124,7 +118,7 @@ function Hero() {
 
         <motion.div
           style={{ scale, y }}
-          className="absolute inset-x-0 bottom-[-10%] mx-auto h-[60vh] w-[90%] max-w-5xl overflow-hidden rounded-3xl border border-border shadow-2xl"
+          className="absolute inset-x-0 bottom-[-10%] mx-auto h-[50vh] w-[92%] max-w-5xl overflow-hidden rounded-2xl border border-border shadow-2xl sm:h-[60vh] sm:rounded-3xl"
         >
           <img
             src={heroCamera}
@@ -172,13 +166,13 @@ function VelocityMarquee({ text }) {
   });
 
   return (
-    <section className="overflow-hidden border-y border-border py-8">
+    <section className="overflow-hidden border-y border-border py-6 sm:py-8">
       <motion.div
         style={{ x }}
-        className="flex whitespace-nowrap text-6xl font-semibold tracking-tight sm:text-7xl md:text-8xl"
+        className="flex whitespace-nowrap text-4xl font-semibold tracking-tight sm:text-6xl md:text-7xl lg:text-8xl"
       >
         {Array.from({ length: 6 }).map((_, i) => (
-          <span key={i} className="mx-8 inline-flex items-center gap-8">
+          <span key={i} className="mx-6 inline-flex items-center gap-6 sm:mx-8 sm:gap-8">
             {text}
             <span className="text-primary">●</span>
           </span>
@@ -192,89 +186,68 @@ function wrap(min, max, v) {
   return ((((v - min) % r) + r) % r) + min;
 }
 
-/* ──────────────────────────── PINNED HORIZONTAL GALLERY */
-function HorizontalGallery() {
-  const wrapRef = useRef(null);
-  const trackRef = useRef(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      const track = trackRef.current;
-      const wrap = wrapRef.current;
-      if (!track || !wrap) return;
-      const total = track.scrollWidth - window.innerWidth;
-      gsap.to(track, {
-        x: -total,
-        ease: "none",
-        scrollTrigger: {
-          trigger: wrap,
-          start: "top top",
-          end: () => `+=${total}`,
-          scrub: 1,
-          pin: true,
-          invalidateOnRefresh: true,
-        },
-      });
-    }, wrapRef);
-    return () => ctx.revert();
-  }, []);
-
+/* ──────────────────────────── GALLERY GRID (replaces pinned horizontal scroll)
+   The GSAP pin caused body overflow to be locked, which broke React Router
+   navigation — clicks on NavLinks didn't register until after a page refresh.
+   This plain CSS grid/scroll approach is fully mobile-friendly and works correctly. */
+function GalleryGrid() {
   const photos = [
     { src: g1, title: "Ridge / Golden hour", tag: "Landscape" },
-    { src: g2, title: "Neon district", tag: "Street" },
-    { src: g3, title: "Lumen study", tag: "Portrait" },
-    { src: g4, title: "Concrete light", tag: "Architecture" },
-    { src: g5, title: "Canopy fog", tag: "Aerial" },
+    { src: g2, title: "Neon district",        tag: "Street"    },
+    { src: g3, title: "Lumen study",          tag: "Portrait"  },
+    { src: g4, title: "Concrete light",       tag: "Architecture" },
+    { src: g5, title: "Canopy fog",           tag: "Aerial"    },
   ];
 
   return (
-    <section ref={wrapRef} className="relative overflow-hidden">
-      <div ref={trackRef} className="flex h-screen items-center gap-8 pl-[10vw] pr-[10vw] will-change-transform">
-        <div className="flex h-full w-[60vw] shrink-0 flex-col justify-center">
-          <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-            01 — Featured shots
-          </div>
-          <h2 className="mt-4 text-5xl font-semibold tracking-tight md:text-7xl">
-            A library of light, <br />
-            <span className="text-glow">licensed in seconds.</span>
-          </h2>
-          <p className="mt-6 max-w-md text-muted-foreground">
-            Scroll →  to flip through the gallery. Every frame is
-            available for blog, social, or commercial use.
-          </p>
-        </div>
-
-        {photos.map((p, i) => (
-          <div
-            key={i}
-            className="group relative h-[72vh] w-[52vh] shrink-0 overflow-hidden rounded-2xl border border-border"
-          >
-            <img
-              src={p.src}
-              alt={p.title}
-              loading="lazy"
-              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-            <div className="absolute bottom-5 left-5 right-5">
-              <div className="text-xs uppercase tracking-widest text-primary">
-                {p.tag}
-              </div>
-              <div className="mt-1 text-xl font-medium">{p.title}</div>
+    <section className="px-4 py-20 sm:px-6 sm:py-28">
+      <div className="mx-auto max-w-7xl">
+        {/* Header */}
+        <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+              01 — Featured shots
             </div>
-            <div className="absolute right-4 top-4 rounded-full bg-background/70 px-3 py-1 text-xs backdrop-blur">
-              0{i + 1} / 0{photos.length}
-            </div>
+            <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
+              A library of light, <br />
+              <span className="text-glow">licensed in seconds.</span>
+            </h2>
           </div>
-        ))}
-
-        <div className="flex h-full w-[40vw] shrink-0 items-center">
           <Link
             to="/shop"
-            className="btn-glow inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground"
+            className="btn-glow inline-flex items-center gap-2 self-start rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground sm:self-auto"
           >
-            Open full gallery <ArrowUpRight className="h-4 w-4" />
+            Full gallery <ArrowUpRight className="h-4 w-4" />
           </Link>
+        </div>
+
+        {/* Scrollable card row on mobile, grid on desktop */}
+        <div className="flex gap-4 overflow-x-auto pb-4 sm:pb-0 sm:grid sm:grid-cols-3 lg:grid-cols-5 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {photos.map((p, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.7, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              className="group relative shrink-0 w-[72vw] sm:w-auto overflow-hidden rounded-2xl border border-border"
+            >
+              <img
+                src={p.src}
+                alt={p.title}
+                loading="lazy"
+                className="aspect-[3/4] w-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+              <div className="absolute bottom-4 left-4 right-4">
+                <div className="text-[10px] uppercase tracking-widest text-primary">{p.tag}</div>
+                <div className="mt-1 text-base font-medium leading-tight">{p.title}</div>
+              </div>
+              <div className="absolute right-3 top-3 rounded-full bg-background/70 px-2.5 py-1 text-[10px] backdrop-blur">
+                0{i + 1} / 0{photos.length}
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
@@ -295,9 +268,10 @@ function ParallaxShowcase() {
   const rot = useTransform(scrollYProgress, [0, 1], [-4, 4]);
 
   return (
-    <section ref={ref} className="relative px-6 py-32">
-      <div className="mx-auto grid max-w-7xl gap-16 md:grid-cols-2 md:items-center">
-        <div className="relative h-[80vh]">
+    <section ref={ref} className="relative px-4 py-20 sm:px-6 sm:py-32">
+      <div className="mx-auto grid max-w-7xl gap-12 md:grid-cols-2 md:items-center">
+        {/* On mobile, hide the parallax floats and show a simple image stack */}
+        <div className="relative hidden h-[80vh] md:block">
           <motion.div
             style={{ y: y1, rotate: rot }}
             className="absolute left-0 top-0 h-64 w-48 overflow-hidden rounded-2xl border border-border shadow-2xl"
@@ -318,15 +292,24 @@ function ParallaxShowcase() {
           </motion.div>
         </div>
 
+        {/* Mobile: simple stacked thumbnails */}
+        <div className="grid grid-cols-2 gap-3 md:hidden">
+          {[g3, g4, g2, g1].map((src, i) => (
+            <div key={i} className={`overflow-hidden rounded-xl border border-border ${i === 3 ? "col-span-2" : ""}`}>
+              <img src={src} alt="" className="aspect-[4/3] w-full object-cover" loading="lazy" />
+            </div>
+          ))}
+        </div>
+
         <div>
           <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
             02 — How it works
           </div>
-          <h2 className="mt-4 text-5xl font-semibold tracking-tight md:text-6xl">
+          <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
             Two flows. <br />
             <span className="text-glow">One clean checkout.</span>
           </h2>
-          <ul className="mt-10 space-y-6">
+          <ul className="mt-8 space-y-6">
             {[
               ["Pick dates", "Live calendar shows what's free. Confirm details instantly."],
               ["Guarantor Upload", "Simple ID submission for secure verification."],
@@ -340,7 +323,7 @@ function ParallaxShowcase() {
                   0{i + 1}
                 </span>
                 <div>
-                  <div className="text-xl font-medium">{t}</div>
+                  <div className="text-lg font-medium">{t}</div>
                   <div className="mt-1 text-sm text-muted-foreground">{d}</div>
                 </div>
               </li>
@@ -370,19 +353,19 @@ function PinReveal() {
       <div className="sticky top-0 flex h-screen items-center justify-center overflow-hidden">
         <motion.div
           style={{ opacity: textO, y: textY }}
-          className="absolute z-10 px-6 text-center"
+          className="absolute z-10 px-4 text-center"
         >
           <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
             03 — Made for the moment
           </div>
-          <h2 className="mt-4 text-5xl font-semibold tracking-tight md:text-7xl">
+          <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl md:text-7xl">
             Every frame, <br />
             <span className="text-glow">cinema-grade.</span>
           </h2>
         </motion.div>
         <motion.div
           style={{ scale, borderRadius: round }}
-          className="relative h-[80vh] w-[60vw] overflow-hidden border border-border"
+          className="relative h-[70vh] w-[90vw] overflow-hidden border border-border sm:h-[80vh] sm:w-[60vw]"
         >
           <img src={g1} alt="" className="h-full w-full object-cover" loading="lazy" />
           <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent" />
@@ -416,18 +399,18 @@ function Pricing() {
     },
   ];
   return (
-    <section className="px-6 py-32">
+    <section className="px-4 py-20 sm:px-6 sm:py-32">
       <div className="mx-auto max-w-6xl">
         <motion.h2
           initial={{ y: 40, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-14 text-center text-5xl font-semibold tracking-tight md:text-6xl"
+          className="mb-10 text-center text-4xl font-semibold tracking-tight sm:mb-14 sm:text-5xl md:text-6xl"
         >
           Honest, flat pricing.
         </motion.h2>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {tiers.map((t, i) => (
             <motion.div
               key={t.name}
@@ -439,21 +422,21 @@ function Pricing() {
                 delay: i * 0.1,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className={`rounded-3xl border p-8 flex flex-col justify-between ${
+              className={`rounded-3xl border p-6 flex flex-col justify-between sm:p-8 ${
                 t.featured
-                  ? "border-primary/60 bg-primary/5 btn-glow animate-pulse-subtle"
+                  ? "border-primary/60 bg-primary/5 btn-glow"
                   : "border-border bg-card"
               }`}
             >
               <div>
                 <div className="text-sm text-muted-foreground">{t.name}</div>
                 <div className="mt-3 flex items-baseline gap-1">
-                  <span className="text-5xl font-semibold tracking-tight">
+                  <span className="text-4xl font-semibold tracking-tight sm:text-5xl">
                     {t.price}
                   </span>
                   <span className="text-sm text-muted-foreground">{t.unit}</span>
                 </div>
-                <ul className="mt-8 space-y-2.5 text-sm text-muted-foreground">
+                <ul className="mt-6 space-y-2.5 text-sm text-muted-foreground sm:mt-8">
                   {t.notes.map((n) => (
                     <li key={n} className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-primary shrink-0" /> <span>{n}</span>
@@ -463,7 +446,7 @@ function Pricing() {
               </div>
               <Link
                 to="/rent"
-                className={`mt-8 inline-flex w-full items-center justify-center rounded-full px-4 py-2.5 text-sm font-semibold transition-colors ${
+                className={`mt-6 inline-flex w-full items-center justify-center rounded-full px-4 py-2.5 text-sm font-semibold transition-colors sm:mt-8 ${
                   t.featured
                     ? "bg-primary text-primary-foreground hover:bg-primary/95"
                     : "border border-border text-foreground hover:bg-muted"
@@ -482,25 +465,25 @@ function Pricing() {
 /* ────────────────────────────────────────── CTA */
 function CTA() {
   return (
-    <section className="relative overflow-hidden px-6 py-32">
+    <section className="relative overflow-hidden px-4 py-20 sm:px-6 sm:py-32">
       <div className="absolute left-1/2 top-1/2 -z-10 h-[400px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/15 blur-[180px]" />
       <div className="mx-auto max-w-4xl text-center">
-        <h2 className="text-5xl font-semibold tracking-tight md:text-7xl">
+        <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl md:text-7xl">
           Ready to <span className="text-glow">roll the shutter?</span>
         </h2>
-        <p className="mt-6 text-muted-foreground">
+        <p className="mt-6 text-sm text-muted-foreground sm:text-base">
           Book your weekend with the 80D, or grab a frame from the shop.
         </p>
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:mt-10">
           <Link
             to="/rent"
-            className="btn-glow rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground"
+            className="btn-glow rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground sm:px-6 sm:py-3"
           >
             Rent the 80D
           </Link>
           <Link
             to="/shop"
-            className="rounded-full border border-border bg-card px-6 py-3 text-sm font-semibold"
+            className="rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold sm:px-6 sm:py-3"
           >
             Browse photos
           </Link>
@@ -515,7 +498,7 @@ export default function Home() {
     <>
       <Hero />
       <VelocityMarquee text="Cinema 24mm · 50mm Prime · ISO 6400 · Frame 80D" />
-      <HorizontalGallery />
+      <GalleryGrid />
       <ParallaxShowcase />
       <PinReveal />
       <Pricing />

@@ -15,12 +15,25 @@ public class WebMvcConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of(
-            "http://localhost:5173",   // Vite dev server
-            "https://lensdock.vercel.app" // Production frontend
+
+        // Allowed origins:
+        //   - Local Vite dev server
+        //   - Vercel production deployment
+        //   - Any Vercel preview deployment (*.vercel.app)
+        //   - Direct AWS IP (for Postman / admin testing)
+        config.setAllowedOriginPatterns(List.of(
+            "http://localhost:5173",
+            "http://localhost:3000",
+            "https://lensdock.vercel.app",
+            "https://*.vercel.app",
+            "http://13.235.138.219:*",
+            "http://13.235.138.219"
         ));
+
         config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("Authorization", "Content-Type"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        config.setMaxAge(3600L); // Cache preflight for 1 hour
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", config);

@@ -21,5 +21,14 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
+    // In local dev, proxy /api/* → Spring Boot on localhost:8080
+    // This mirrors the Vercel rewrite so the same relative /api path works everywhere
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
 });
