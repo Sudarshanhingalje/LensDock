@@ -179,17 +179,27 @@ export default function Poses() {
                   <Reveal key={pose.id || idx} delay={(idx % 6) * 0.05}>
                     <div className="bg-card/25 backdrop-blur-sm rounded-2xl border border-border p-4 transition-all hover:border-primary/30 hover:scale-[1.02] duration-300 flex flex-col justify-between h-full">
                       <div>
-                        {/* Placeholder pose box as requested */}
-                        {/* TODO: Replace placeholder boxes with real AI-generated pose images later.
-                            I will add my own pose images from AI and update the card data. */}
-                        <div className="h-28 border border-dashed border-border/80 rounded-xl flex flex-col items-center justify-center text-center p-4 bg-slate-950/80 mb-4 hover:bg-slate-950 transition-colors duration-300">
-                          <span className="text-xs font-bold text-muted-foreground/40 uppercase tracking-wider mb-1">
-                            {pose.gender.toUpperCase()} - {pose.poseType.toUpperCase()} POSE {idx + 1}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground/30 font-mono">
-                            [AI Image Placeholder]
-                          </span>
-                        </div>
+                        {pose.imagePath ? (
+                          <div className="h-64 overflow-hidden rounded-xl border border-border bg-slate-900/40 flex items-center justify-center mb-4">
+                            <img
+                              src={pose.imagePath}
+                              alt={pose.poseTitle}
+                              className="w-full h-full object-contain transition-transform hover:scale-[1.03] duration-500"
+                            />
+                          </div>
+                        ) : (
+                          /* Placeholder/AI pose box as requested */
+                          /* TODO: Replace placeholder boxes with real AI-generated pose images later.
+                              I will add my own pose images from AI and update the card data. */
+                          <div className="h-32 border border-dashed border-border/80 rounded-xl flex flex-col items-center justify-center text-center p-4 bg-slate-950/80 mb-4 hover:bg-slate-950 transition-colors duration-300">
+                            <span className="text-xs font-bold text-muted-foreground/40 uppercase tracking-wider mb-1">
+                              {pose.gender.toUpperCase()} - {pose.poseType.toUpperCase()} POSE {idx + 1}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground/30 font-mono">
+                              [AI Image Placeholder]
+                            </span>
+                          </div>
+                        )}
 
                         <div className="text-[10px] uppercase tracking-[0.2em] text-primary mb-1 font-bold">
                           {pose.poseSub}
