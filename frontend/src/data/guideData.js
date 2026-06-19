@@ -233,6 +233,190 @@ const realMaleNormalPoses = [
   }
 ];
 
+// Predefined real data for Male Event Poses 1-30
+const realMaleEventPoses = [
+  {
+    title: "Corporate Business Conference",
+    desc: "Location: Mumbai office lobby. Outfit: Navy blue suit + white shirt. Standing near conference podium, one hand on podium, professional confident look.",
+    sub: "Event · Corporate",
+    image: "/male/events/e-1.png"
+  },
+  {
+    title: "Rock Concert Stage Pose",
+    desc: "Location: Pune concert stage. Outfit: Black graphic tee + ripped jeans + black boots. Standing on stage edge, one hand on mic stand, cool smirk.",
+    sub: "Event · Concert",
+    image: "/male/events/e-2.png"
+  },
+  {
+    title: "Tech Product Launch",
+    desc: "Location: Bangalore tech hub. Outfit: Light gray blazer + white shirt + charcoal jeans. Standing near product screen, one hand on screen, confident smile.",
+    sub: "Event · Tech",
+    image: "/male/events/e-3.png"
+  },
+  {
+    title: "Kolhapur Food Festival",
+    desc: "Location: Kolhapur outdoor food stalls. Outfit: White kurta + beige chinos. Standing near food counter, holding plate, natural friendly smile.",
+    sub: "Event · Food",
+    image: "/male/events/e-4.png"
+  },
+  {
+    title: "Pune Art Gallery",
+    desc: "Location: Pune art gallery. Outfit: Burgundy sweater + black jeans. Standing near painting, one hand on wall, thoughtful expression.",
+    sub: "Event · Art",
+    image: "/male/events/e-5.png"
+  },
+  {
+    title: "Wedding Reception Sabyasabi Style",
+    desc: "Location: Mumbai luxury hotel. Outfit: Deep maroon sherwani + gold churidar. Standing near flower arch, one hand on arch, elegant groom look.",
+    sub: "Event · Wedding",
+    image: "/male/events/e-6.png"
+  },
+  {
+    title: "Sangeet Dance Performance",
+    desc: "Location: Pune outdoor stage. Outfit: Black kurta + silver embroidery + black jeans. Dancing pose on stage, one hand raised, energetic fun smile.",
+    sub: "Event · Wedding",
+    image: "/male/events/e-7.png"
+  },
+  {
+    title: "Haldi Ceremony Traditional",
+    desc: "Location: Kolhapur traditional house. Outfit: Bright yellow kurta-pajama + orange shawl. Sitting on decorated chair, hands showing Haldi, happy excited smile.",
+    sub: "Event · Wedding",
+    image: "/male/events/e-8.png"
+  },
+  {
+    title: "Baraat Royal Groom Entry",
+    desc: "Location: Mumbai street baraat. Outfit: Cream sherwani + gold turban + gold jewelry. Sitting on decorated horse, one hand on reins, royal groom smile.",
+    sub: "Event · Wedding",
+    image: "/male/events/e-9.png"
+  },
+  {
+    title: "Wedding Ceremony Mandap",
+    desc: "Location: Pune Ganapati temple. Outfit: White dhoti-pant + red silk angavastram. Standing at mandap, hands joined in prayer, sacred serious expression.",
+    sub: "Event · Wedding",
+    image: "/male/events/e-10.png"
+  },
+  {
+    title: "Wedding Photo Booth Trending",
+    desc: "Location: Bangalore wedding photo booth. Outfit: Navy bandhgala + white shirt. Standing at photo booth, one hand on frame, trendy Insta pose, cool smile.",
+    sub: "Event · Wedding",
+    image: "/male/events/e-11.png"
+  },
+  {
+    title: "Wedding Dinner Guest",
+    desc: "Location: Mumbai luxury hotel dinner. Outfit: Charcoal gray suit + light blue shirt. Sitting at dinner table, one hand on wine glass, elegant relaxed pose.",
+    sub: "Event · Wedding",
+    image: "/male/events/e-12.png"
+  },
+  {
+    title: "Mehendi Casual Traditional",
+    desc: "Location: Kolhapur outdoor garden. Outfit: Light green kurta + white pajama + orange scarf. Standing in garden, holding Mehendi cone, playful fun smile.",
+    sub: "Event · Wedding",
+    image: "/male/events/e-13.png"
+  },
+  {
+    title: "Wedding After Party Night",
+    desc: "Location: Pune night club. Outfit: Black leather jacket + white tee + black jeans. Standing near club entrance, one hand on jacket, night party cool look.",
+    sub: "Event · Wedding",
+    image: "/male/events/e-14.png"
+  },
+  {
+    title: "Wedding Morning Fresh Groom",
+    desc: "Location: Mumbai groom bedroom. Outfit: White fresh kurta + light blue pajama. Sitting near makeup mirror, one hand on face, fresh morning groom, soft smile.",
+    sub: "Event · Wedding",
+    image: "/male/events/e-15.png"
+  },
+  {
+    title: "Vaar Traditional Groom Entry",
+    desc: "Location: Kolhapur traditional house entrance. Outfit: Cream sherwani + red dupatta + gold turban. Walking through entrance, one hand on garland, graceful walk.",
+    sub: "Event · Wedding",
+    image: "/male/events/e-16.png"
+  },
+  {
+    title: "Wedding Roast Comedy Night",
+    desc: "Location: Pune indoor stage. Outfit: Navy blazer + white shirt + black jeans. Standing on stage with mic, one hand on mic, funny comedy expression.",
+    sub: "Event · Wedding",
+    image: "/male/events/e-17.png"
+  },
+  {
+    title: "Gift Exchange Formal Guest",
+    desc: "Location: Mumbai wedding hall. Outfit: Light gray suit + white shirt + blue tie. Standing near gift table, holding gift box, polite formal smile.",
+    sub: "Event · Wedding",
+    image: "/male/events/e-18.png"
+  },
+  {
+    title: "Dance Performance Showtime",
+    desc: "Location: Bangalore wedding stage. Outfit: Black kurta + red embroidery + black jeans. Mid-dance jump on stage, both arms raised, energetic performance.",
+    sub: "Event · Wedding",
+    image: "/male/events/e-19.png"
+  },
+  {
+    title: "Congratulations Best Friend",
+    desc: "Location: Pune wedding photo area. Outfit: Burgundy bandhgala + white shirt. Standing with groom, one hand on shoulder, warm happy smile, congratulating.",
+    sub: "Event · Wedding",
+    image: "/male/events/e-20.png"
+  },
+  {
+    title: "Mumbai Fashion Show Runway",
+    desc: "Location: Mumbai fashion runway. Outfit: Designer black velvet jacket + white tee + black jeans. Walking on runway, one hand on jacket, confident model walk.",
+    sub: "Event · Fashion",
+    image: "/male/events/e-21.png"
+  },
+  {
+    title: "Kolhapur Heritage Festival",
+    desc: "Location: Kolhapur heritage site. Outfit: Brown kurta-pajama + orange shawl. Standing near heritage pillar, one hand on pillar, respectful cultural pose.",
+    sub: "Event · Cultural",
+    image: "/male/events/e-22.png"
+  },
+  {
+    title: "Pune Charity Marathon",
+    desc: "Location: Pune marathon start line. Outfit: Blue running jersey + black shorts + running shoes. Standing at start, one hand on race bib, athletic ready pose.",
+    sub: "Event · Sports",
+    image: "/male/events/e-23.png"
+  },
+  {
+    title: "Bangalore Book Launch",
+    desc: "Location: Bangalore bookstore. Outfit: Beige blazer + white shirt + charcoal jeans. Standing near book display, holding book, one hand on book, intellectual smile.",
+    sub: "Event · Literary",
+    image: "/male/events/e-24.png"
+  },
+  {
+    title: "Mumbai Awards Gala Night",
+    desc: "Location: Mumbai awards stage. Outfit: Black tuxedo + white shirt + black bow tie. Standing on red carpet, holding award trophy, proud elegant smile.",
+    sub: "Event · Awards",
+    image: "/male/events/e-25.png"
+  },
+  {
+    title: "Bangalore Tech Startup Conference",
+    desc: "Location: Bangalore tech conference hall. Outfit: Dark gray blazer + white shirt + black jeans. Standing near screen, one hand on screen, confident entrepreneur pose.",
+    sub: "Event · Tech",
+    image: "/male/events/e-26.png"
+  },
+  {
+    title: "Pune Indie Music Festival",
+    desc: "Location: Pune outdoor festival stage. Outfit: Distressed black denim jacket + graphic tee + ripped jeans. Standing on stage with guitar, one hand on neck, cool artistic pose.",
+    sub: "Event · Music",
+    image: "/male/events/e-27.png"
+  },
+  {
+    title: "Kolhapur Wellness Charity Run",
+    desc: "Location: Kolhapur park running track. Outfit: White running tee + black tights + running shoes. Running pose on track, one arm forward, active motion, healthy smile.",
+    sub: "Event · Wellness",
+    image: "/male/events/e-28.png"
+  },
+  {
+    title: "Mumbai Luxury Gala Dinner",
+    desc: "Location: Mumbai luxury ballroom. Outfit: Navy tuxedo + white shirt + navy bow tie. Sitting at dinner table, one hand on wine glass, sophisticated elegant pose.",
+    sub: "Event · Luxury",
+    image: "/male/events/e-29.png"
+  },
+  {
+    title: "Pune Film Premiere Red Carpet",
+    desc: "Location: Pune cinema theater premiere. Outfit: Black leather blazer + white tee + black jeans. Standing on red carpet, one hand on poster, cinematic cool pose.",
+    sub: "Event · Cinema",
+    image: "/male/events/e-30.png"
+  }
+];
+
 // Dynamically generate the 180 placeholder poses (30 per gender/type combination)
 const generatePoses = () => {
   const list = [];
@@ -258,7 +442,33 @@ const generatePoses = () => {
             poseSub: realPose.sub,
             imagePath: realPose.image
           });
-        } else {
+        }
+        // Check if we need to insert real Male Event poses (1-30)
+        else if (gender === "male" && type === "event" && i <= 30) {
+          const realPose = realMaleEventPoses[i - 1];
+          list.push({
+            id: id++,
+            gender: gender,
+            poseType: type,
+            poseTitle: realPose.title,
+            poseDescription: realPose.desc,
+            poseSub: realPose.sub,
+            imagePath: realPose.image
+          });
+        }
+        // Check if we need to insert real Female Normal poses (1-10)
+        else if (gender === "female" && type === "normal" && i <= 10) {
+          list.push({
+            id: id++,
+            gender: gender,
+            poseType: type,
+            poseTitle: `Female Normal Pose ${i}`,
+            poseDescription: `Placeholder: Body 45° turned, one leg forward. Suitable for normal shoot.`,
+            poseSub: `Normal · Portrait`,
+            imagePath: `/female/normal/ng-${i}.png`
+          });
+        }
+        else {
           list.push({
             id: id++,
             gender: gender,
