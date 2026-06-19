@@ -1,53 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { PageHero, Reveal } from "../components/PageHero";
-import { getCameraSteps, getPoses } from "../lib/api";
+import { cameraSteps, poses } from "../data/guideData";
 
 export default function Poses() {
   const [activeTab, setActiveTab] = useState("camera"); // "camera" or "poses"
   const [gender, setGender] = useState("male"); // "male" or "female"
   const [poseType, setPoseType] = useState("normal"); // "normal", "event", or "group"
 
-  const [cameraSteps, setCameraSteps] = useState([]);
-  const [loadingCamera, setLoadingCamera] = useState(true);
-  const [cameraError, setCameraError] = useState(null);
-
-  const [poses, setPoses] = useState([]);
-  const [loadingPoses, setLoadingPoses] = useState(true);
-  const [posesError, setPosesError] = useState(null);
-
-  // Fetch camera steps on mount
-  useEffect(() => {
-    setLoadingCamera(true);
-    getCameraSteps()
-      .then((data) => {
-        setCameraSteps(data || []);
-        setCameraError(null);
-      })
-      .catch((err) => {
-        console.error("Error fetching camera steps:", err);
-        setCameraError("Failed to load camera guide steps.");
-      })
-      .finally(() => {
-        setLoadingCamera(false);
-      });
-  }, []);
-
-  // Fetch poses when filters (gender, poseType) change
-  useEffect(() => {
-    setLoadingPoses(true);
-    getPoses(gender, poseType)
-      .then((data) => {
-        setPoses(data || []);
-        setPosesError(null);
-      })
-      .catch((err) => {
-        console.error("Error fetching poses:", err);
-        setPosesError("Failed to load poses guide.");
-      })
-      .finally(() => {
-        setLoadingPoses(false);
-      });
-  }, [gender, poseType]);
+  // Filter poses in memory based on current state
+  const filteredPoses = poses.filter(
+    (p) => p.gender === gender && p.poseType === poseType
+  );
 
   return (
     <>
@@ -128,45 +91,37 @@ export default function Poses() {
         {activeTab === "camera" ? (
           // Camera Guide Section
           <div className="space-y-6">
-            {loadingCamera ? (
-              <div className="py-20 text-center text-sm text-muted-foreground animate-pulse">
-                Loading camera guide steps...
-              </div>
-            ) : cameraError ? (
-              <div className="py-20 text-center text-sm text-red-500">{cameraError}</div>
-            ) : (
-              cameraSteps.map((step, idx) => (
-                <Reveal key={step.id || idx} delay={idx * 0.05}>
-                  <div className="flex flex-col md:flex-row items-stretch md:items-center gap-6 border border-dashed border-border rounded-2xl p-5 bg-card/20 backdrop-blur-sm transition-all hover:border-primary/30 duration-300">
-                    <div className="flex-1 flex flex-col justify-center">
-                      <div className="text-xs uppercase tracking-widest text-muted-foreground mb-1 font-semibold">
-                        {step.stepSub}
-                      </div>
-                      <div className="text-lg font-semibold text-foreground mb-2">
-                        {step.stepTitle}
-                      </div>
-                      <div className="text-sm text-muted-foreground leading-relaxed">
-                        {step.stepBody}
-                      </div>
+            {cameraSteps.map((step, idx) => (
+              <Reveal key={step.id || idx} delay={idx * 0.05}>
+                <div className="flex flex-col md:flex-row items-stretch md:items-center gap-6 border border-dashed border-border rounded-2xl p-5 bg-card/20 backdrop-blur-sm transition-all hover:border-primary/30 duration-300">
+                  <div className="flex-1 flex flex-col justify-center">
+                    <div className="text-xs uppercase tracking-widest text-muted-foreground mb-1 font-semibold">
+                      {step.stepSub}
                     </div>
-                    
-                    <div className="flex items-center justify-center text-3xl text-primary font-light py-2 md:py-0">
-                      <span className="hidden md:inline">➝</span>
-                      <span className="inline md:hidden rotate-90">➝</span>
+                    <div className="text-lg font-semibold text-foreground mb-2">
+                      {step.stepTitle}
                     </div>
-
-                    <div className="flex-1 overflow-hidden rounded-xl border border-border bg-slate-900/60 aspect-video md:aspect-[16/10] flex items-center justify-center">
-                      <img
-                        src={step.imagePath}
-                        alt={step.stepTitle}
-                        loading="lazy"
-                        className="w-full h-full object-cover transition-transform hover:scale-105 duration-500"
-                      />
+                    <div className="text-sm text-muted-foreground leading-relaxed">
+                      {step.stepBody}
                     </div>
                   </div>
-                </Reveal>
-              ))
-            )}
+                  
+                  <div className="flex items-center justify-center text-3xl text-primary font-light py-2 md:py-0">
+                    <span className="hidden md:inline">➝</span>
+                    <span className="inline md:hidden rotate-90">➝</span>
+                  </div>
+
+                  <div className="flex-1 w-full flex items-center justify-center rounded-xl overflow-hidden bg-slate-900/40 p-2 border border-border/80">
+                    <img
+                      src={step.imagePath}
+                      alt={step.stepTitle}
+                      loading="lazy"
+                      className="w-full h-auto max-h-[300px] object-contain rounded-lg transition-transform hover:scale-[1.02] duration-500"
+                    />
+                  </div>
+                </div>
+              </Reveal>
+            ))}
           </div>
         ) : (
           // Pose Guide Section
@@ -214,19 +169,13 @@ export default function Poses() {
               </div>
             </div>
 
-            {loadingPoses ? (
-              <div className="py-20 text-center text-sm text-muted-foreground animate-pulse">
-                Loading pose recommendation cards...
-              </div>
-            ) : posesError ? (
-              <div className="py-20 text-center text-sm text-red-500">{posesError}</div>
-            ) : poses.length === 0 ? (
+            {filteredPoses.length === 0 ? (
               <div className="py-20 text-center text-sm text-muted-foreground">
                 No poses found for the selected category.
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {poses.map((pose, idx) => (
+                {filteredPoses.map((pose, idx) => (
                   <Reveal key={pose.id || idx} delay={(idx % 6) * 0.05}>
                     <div className="bg-card/25 backdrop-blur-sm rounded-2xl border border-border p-4 transition-all hover:border-primary/30 hover:scale-[1.02] duration-300 flex flex-col justify-between h-full">
                       <div>

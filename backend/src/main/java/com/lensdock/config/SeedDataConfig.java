@@ -8,10 +8,6 @@ import com.lensdock.feature.photo.Photo;
 import com.lensdock.feature.photo.PhotoRepository;
 import com.lensdock.feature.settings.Settings;
 import com.lensdock.feature.settings.SettingsRepository;
-import com.lensdock.feature.camerastep.CameraStep;
-import com.lensdock.feature.camerastep.CameraStepRepository;
-import com.lensdock.feature.pose.Pose;
-import com.lensdock.feature.pose.PoseRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -23,23 +19,17 @@ public class SeedDataConfig implements CommandLineRunner {
     private final GearRepository gearRepository;
     private final PhotoRepository photoRepository;
     private final SettingsRepository settingsRepository;
-    private final CameraStepRepository cameraStepRepository;
-    private final PoseRepository poseRepository;
     private final PasswordEncoder passwordEncoder;
 
     public SeedDataConfig(UserRepository userRepository,
                           GearRepository gearRepository,
                           PhotoRepository photoRepository,
                           SettingsRepository settingsRepository,
-                          CameraStepRepository cameraStepRepository,
-                          PoseRepository poseRepository,
                           PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.gearRepository = gearRepository;
         this.photoRepository = photoRepository;
         this.settingsRepository = settingsRepository;
-        this.cameraStepRepository = cameraStepRepository;
-        this.poseRepository = poseRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -115,76 +105,6 @@ public class SeedDataConfig implements CommandLineRunner {
                 photoRepository.save(p);
             }
             System.out.println("✅ Default photos catalog seeded.");
-        }
-
-        // 5. Seed Camera Steps
-        if (cameraStepRepository.count() == 0) {
-            String[] subs = {
-                "Step 1 · Camera Mode",
-                "Step 2 · Aperture Settings",
-                "Step 3 · Focus Mode",
-                "Step 4 · Focus Point",
-                "Step 5 · ISO Configuration",
-                "Step 6 · White Balance"
-            };
-            String[] titles = {
-                "Start in Aperture Priority (Av)",
-                "Set a Wide Aperture (f/1.8 - f/2.8)",
-                "Switch to One-Shot AF",
-                "Choose Single-Point AF",
-                "Keep ISO Low (ISO 100 - 400)",
-                "Select White Balance Preset"
-            };
-            String[] bodies = {
-                "Turn the mode dial to Av. Camera will handle shutter speed automatically. For portraits and single-person photos, this is the easiest way to get blurred background.",
-                "Rotate the main dial to set the lowest possible f-number. A lower f-number means a wider aperture, which lets in more light and creates a shallow depth of field.",
-                "Press the AF selection button and set it to One-Shot AF. This is ideal for stationary subjects since it locks the focus when you press the shutter button halfway down.",
-                "Manually select a single active focus point. Use the multicontroller to place this point directly over the eye of your subject for razor-sharp portraits.",
-                "Keep your ISO low in daylight or bright conditions to ensure the cleanest possible image. Raise it only when you need to maintain a fast shutter speed in low light.",
-                "Instead of Auto White Balance (AWB), set it manually (e.g. Daylight, Shade, Cloudy) to match your environment. This keeps skin tones and colors consistent."
-            };
-            String[] images = {
-                "/image-1.png",
-                "/image-2.png",
-                "/image-3.png",
-                "/image-4.png",
-                "/image-5.png",
-                "/image-6.png"
-            };
-
-            for (int i = 0; i < 6; i++) {
-                CameraStep step = new CameraStep();
-                step.setStepNumber(i + 1);
-                step.setStepSub(subs[i]);
-                step.setStepTitle(titles[i]);
-                step.setStepBody(bodies[i]);
-                step.setImagePath(images[i]);
-                cameraStepRepository.save(step);
-            }
-            System.out.println("✅ Default camera steps seeded.");
-        }
-
-        // 6. Seed Poses
-        if (poseRepository.count() == 0) {
-            String[] genders = {"male", "female"};
-            String[] poseTypes = {"normal", "event", "group"};
-
-            for (String gender : genders) {
-                for (String type : poseTypes) {
-                    for (int i = 1; i <= 30; i++) {
-                        Pose pose = new Pose();
-                        pose.setGender(gender);
-                        pose.setPoseType(type);
-                        String capGender = gender.substring(0, 1).toUpperCase() + gender.substring(1);
-                        String capType = type.substring(0, 1).toUpperCase() + type.substring(1);
-                        pose.setPoseTitle(capGender + " " + capType + " Pose " + i);
-                        pose.setPoseDescription("Placeholder: Body 45° turned, one leg forward. Suitable for " + type + " shoot.");
-                        pose.setPoseSub(capType + " · Portrait");
-                        poseRepository.save(pose);
-                    }
-                }
-            }
-            System.out.println("✅ Default 180 poses seeded.");
         }
     }
 }
