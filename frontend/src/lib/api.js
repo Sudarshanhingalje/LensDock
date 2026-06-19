@@ -110,3 +110,10 @@ export const api = {
   delete: (path, options = {}) =>
     request(path, { ...options, method: "DELETE" }),
 };
+
+// ─── Poses and Camera Steps ──────────────────────────────────────────────────
+
+export const getCameraSteps = () => request("/camerasteps");
+
+export const getPoses = (gender, poseType) =>
+  request(`/poses?gender=${gender}&poseType=${poseType}`);

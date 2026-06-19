@@ -38,6 +38,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/gear").permitAll()
                 .requestMatchers("/api/photos/**").permitAll()
                 .requestMatchers("/api/licenses").permitAll()
+                .requestMatchers("/api/camerasteps").permitAll()
+                .requestMatchers("/api/poses").permitAll()
                 // ── Admin-only endpoints ──────────────────────────────────
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/settings/admin").hasRole("ADMIN")

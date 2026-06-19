@@ -26,6 +26,7 @@ export function SiteNav() {
     { label: "Rent",  to: "/rent"  },
     { label: "Shop",  to: "/shop"  },
     { label: "About", to: "/about" },
+    { label: "Poses", to: "/poses" },
   ];
 
   return (
